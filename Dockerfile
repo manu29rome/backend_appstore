@@ -22,6 +22,7 @@ ENV JWT_SECRET=suitextech-jwt-s3cr3t-2024-railway-prod-k9mXpQwRvLnZ
 ENV JWT_EXPIRES_IN=15m
 ENV JWT_REFRESH_SECRET=suitextech-refresh-s3cr3t-2024-railway-prod-hT7yBdNcFjW2
 ENV JWT_REFRESH_EXPIRES_IN=7d
+ENV DATABASE_URL=postgresql://postgres:xxskSlvEtkHkTjkIonpWyOMVxdpczGBs@interchange.proxy.rlwy.net:36498/railway
 
 COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
