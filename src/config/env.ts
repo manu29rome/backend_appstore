@@ -26,8 +26,7 @@ function optional(key: string, fallback: string): string {
 }
 
 export function validateEnv(): void {
-  const required: string[] = ['JWT_SECRET', 'JWT_REFRESH_SECRET'];
-  if (!process.env.DATABASE_URL) required.push('DB_NAME', 'DB_USER', 'DB_PASSWORD');
+  const required = ['JWT_SECRET', 'JWT_REFRESH_SECRET'];
   for (const v of required) {
     if (!process.env[v]) throw new Error(`Missing required environment variable: ${v}`);
   }
