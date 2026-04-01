@@ -17,6 +17,11 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV PORT=4000
+ENV JWT_SECRET=suitextech-jwt-s3cr3t-2024-railway-prod-k9mXpQwRvLnZ
+ENV JWT_EXPIRES_IN=15m
+ENV JWT_REFRESH_SECRET=suitextech-refresh-s3cr3t-2024-railway-prod-hT7yBdNcFjW2
+ENV JWT_REFRESH_EXPIRES_IN=7d
 
 COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
