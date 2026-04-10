@@ -6,12 +6,14 @@ import chatRoutes from './chat.routes';
 import testimonialsRoutes from './testimonials.routes';
 import projectsRoutes from './projects.routes';
 import settingsRoutes from './settings.routes';
+import uploadRoutes from './upload.routes';
 import { getDashboardStats } from '../controllers/dashboard.controller';
 import { requireAuth } from '../middleware/auth.middleware';
 
 const router = Router();
 
 router.use('/auth', authRoutes);
+router.use('/upload', uploadRoutes);
 router.use('/contacts', contactsRoutes);
 router.use('/requests', requestsRoutes);
 router.use('/chat', chatRoutes);
