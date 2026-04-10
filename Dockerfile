@@ -23,7 +23,7 @@ ENV JWT_EXPIRES_IN=15m
 ENV JWT_REFRESH_SECRET=suitextech-refresh-s3cr3t-2024-railway-prod-hT7yBdNcFjW2
 ENV JWT_REFRESH_EXPIRES_IN=7d
 ENV DATABASE_URL=postgresql://postgres:xxskSlvEtkHkTjkIonpWyOMVxdpczGBs@interchange.proxy.rlwy.net:36498/railway
-ENV FRONTEND_URL=https://frontendappstore-store.up.railway.app
+ENV FRONTEND_URL=https://www.suitextech.store,https://suitextech.store,https://frontendappstore-store.up.railway.app
 
 COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force

@@ -5,9 +5,11 @@ import { registerChatHandlers } from './chat.handler';
 import { registerAdminHandlers } from './admin.handler';
 
 export function initializeSocket(httpServer: HttpServer): Server {
+  const allowedOrigins = env.FRONTEND_URL.split(',').map(o => o.trim()).filter(Boolean);
+
   const io = new Server(httpServer, {
     cors: {
-      origin: env.FRONTEND_URL,
+      origin: allowedOrigins,
       methods: ['GET', 'POST'],
       credentials: true,
     },
