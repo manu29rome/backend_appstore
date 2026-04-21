@@ -5,7 +5,7 @@ import * as pqrsQueries from '../db/queries/pqrs.queries';
 
 export async function submitPQRS(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { type, full_name, email, phone, subject, description } = req.body;
+    const { type, full_name, email, phone, subject, description, attachments } = req.body;
 
     if (!type || !full_name || !email || !subject || !description)
       throw new AppError('Tipo, nombre, correo, asunto y descripción son requeridos', 400);
@@ -14,6 +14,8 @@ export async function submitPQRS(req: Request, res: Response, next: NextFunction
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       throw new AppError('Correo electrónico inválido', 400);
 
+    const attachmentUrls: string[] = Array.isArray(attachments) ? attachments.filter((u: unknown) => typeof u === 'string') : [];
+
     const pqrs = await pqrsQueries.createPQRS({
       type,
       full_name:   sanitizeString(full_name).substring(0, 100),
@@ -21,6 +23,7 @@ export async function submitPQRS(req: Request, res: Response, next: NextFunction
       phone:       phone ? sanitizeString(phone).substring(0, 30) : undefined,
       subject:     sanitizeString(subject).substring(0, 200),
       description: sanitizeString(description).substring(0, 5000),
+      attachments: attachmentUrls,
       ip_address:  req.ip,
     });
 

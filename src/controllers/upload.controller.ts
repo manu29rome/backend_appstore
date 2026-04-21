@@ -12,10 +12,11 @@ export async function uploadImage(req: Request, res: Response, next: NextFunctio
     const b64      = req.file.buffer.toString('base64');
     const dataUri  = `data:${req.file.mimetype};base64,${b64}`;
 
+    const isPDF = req.file.mimetype === 'application/pdf';
     const result = await cloudinary.uploader.upload(dataUri, {
       folder,
-      resource_type: 'image',
-      transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+      resource_type: isPDF ? 'raw' : 'image',
+      ...(isPDF ? {} : { transformation: [{ quality: 'auto', fetch_format: 'auto' }] }),
     });
 
     success(res, { url: result.secure_url, public_id: result.public_id });

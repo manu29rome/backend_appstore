@@ -8,13 +8,15 @@ export async function createPQRS(data: {
   phone?: string;
   subject: string;
   description: string;
+  attachments?: string[];
   ip_address?: string;
 }): Promise<PQRS> {
   const pool = getPool();
+  const attachmentsJson = JSON.stringify(data.attachments ?? []);
   const insert = await pool.query(
-    `INSERT INTO pqrs (type, full_name, email, phone, subject, description, ip_address)
-     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, created_at`,
-    [data.type, data.full_name, data.email, data.phone || null, data.subject, data.description, data.ip_address || null]
+    `INSERT INTO pqrs (type, full_name, email, phone, subject, description, attachments, ip_address)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id, created_at`,
+    [data.type, data.full_name, data.email, data.phone || null, data.subject, data.description, attachmentsJson, data.ip_address || null]
   );
   const { id, created_at } = insert.rows[0];
   const year = new Date(created_at).getFullYear();

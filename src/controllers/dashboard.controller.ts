@@ -13,7 +13,9 @@ export async function getDashboardStats(req: Request, res: Response, next: NextF
         (SELECT COUNT(*) FROM chat_messages WHERE sender_type = 'visitor' AND is_read = false) AS unread_messages,
         (SELECT COUNT(*) FROM chat_sessions WHERE status = 'active')                   AS active_chat_sessions,
         (SELECT COUNT(*) FROM portfolio_projects WHERE is_published = true)            AS published_projects,
-        (SELECT COUNT(*) FROM testimonials WHERE is_published = true)                  AS published_testimonials
+        (SELECT COUNT(*) FROM testimonials WHERE is_published = true)                  AS published_testimonials,
+        (SELECT COUNT(*) FROM pqrs)                                                    AS total_pqrs,
+        (SELECT COUNT(*) FROM pqrs WHERE status = 'pending')                          AS pending_pqrs
     `);
 
     const activityResult = await pool.query(`
@@ -34,6 +36,8 @@ export async function getDashboardStats(req: Request, res: Response, next: NextF
         active_chat_sessions:  parseInt(row.active_chat_sessions, 10),
         published_projects:    parseInt(row.published_projects, 10),
         published_testimonials:parseInt(row.published_testimonials, 10),
+        total_pqrs:            parseInt(row.total_pqrs, 10),
+        pending_pqrs:          parseInt(row.pending_pqrs, 10),
       },
       recentActivity: activityResult.rows,
     });
