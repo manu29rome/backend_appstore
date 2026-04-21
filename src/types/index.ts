@@ -125,6 +125,7 @@ export interface PQRS {
   description: string;
   status: 'pending' | 'in_progress' | 'resolved' | 'closed';
   admin_comments: string | null;
+  attachments: string[];
   ip_address: string | null;
   created_at: Date;
   updated_at: Date;

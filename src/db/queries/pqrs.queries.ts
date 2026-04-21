@@ -1,6 +1,14 @@
 import { getPool } from '../../config/db';
 import { PQRS } from '../../types';
 
+function parseRow(row: PQRS): PQRS {
+  if (typeof row.attachments === 'string') {
+    try { row.attachments = JSON.parse(row.attachments); } catch { row.attachments = []; }
+  }
+  if (!Array.isArray(row.attachments)) row.attachments = [];
+  return row;
+}
+
 export async function createPQRS(data: {
   type: string;
   full_name: string;
@@ -25,7 +33,7 @@ export async function createPQRS(data: {
     `UPDATE pqrs SET radicado = $1 WHERE id = $2 RETURNING *`,
     [radicado, id]
   );
-  return result.rows[0];
+  return parseRow(result.rows[0]);
 }
 
 export async function getPQRSList(offset: number, limit: number, status?: string): Promise<{ items: PQRS[]; total: number }> {
@@ -39,13 +47,13 @@ export async function getPQRSList(offset: number, limit: number, status?: string
     pool.query(`SELECT COUNT(*) AS total FROM pqrs ${status ? 'WHERE status = $1' : ''}`, status ? [status] : []),
   ]);
 
-  return { items: dataResult.rows, total: parseInt(countResult.rows[0].total, 10) };
+  return { items: dataResult.rows.map(parseRow), total: parseInt(countResult.rows[0].total, 10) };
 }
 
 export async function getPQRSById(id: number): Promise<PQRS | null> {
   const pool = getPool();
   const result = await pool.query(`SELECT * FROM pqrs WHERE id = $1`, [id]);
-  return result.rows[0] || null;
+  return result.rows[0] ? parseRow(result.rows[0]) : null;
 }
 
 export async function updatePQRS(id: number, data: { status?: string; admin_comments?: string }): Promise<PQRS | null> {
@@ -62,7 +70,7 @@ export async function updatePQRS(id: number, data: { status?: string; admin_comm
     `UPDATE pqrs SET ${fields.join(', ')} WHERE id = $${idx} RETURNING *`,
     params
   );
-  return result.rows[0] || null;
+  return result.rows[0] ? parseRow(result.rows[0]) : null;
 }
 
 export async function deletePQRS(id: number): Promise<void> {
