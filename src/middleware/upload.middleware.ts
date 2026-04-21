@@ -1,6 +1,6 @@
 import multer from 'multer';
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'application/pdf'];
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
 const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
 
 export const upload = multer({

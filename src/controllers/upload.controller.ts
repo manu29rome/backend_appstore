@@ -42,7 +42,9 @@ export async function uploadPublic(req: Request, res: Response, next: NextFuncti
     const result = await cloudinary.uploader.upload(dataUri, {
       folder,
       resource_type: isPDF ? 'raw' : 'image',
-      ...(isPDF ? {} : { transformation: [{ quality: 'auto', fetch_format: 'auto' }] }),
+      ...(isPDF
+        ? { use_filename: true, unique_filename: true }
+        : { transformation: [{ quality: 'auto', fetch_format: 'auto' }] }),
     });
 
     success(res, { url: result.secure_url, public_id: result.public_id });
