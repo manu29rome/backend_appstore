@@ -114,6 +114,22 @@ export interface PortfolioProject {
   updated_at: Date;
 }
 
+export interface PQRS {
+  id: number;
+  radicado: string;
+  type: 'peticion' | 'queja' | 'reclamo' | 'sugerencia';
+  full_name: string;
+  email: string;
+  phone: string | null;
+  subject: string;
+  description: string;
+  status: 'pending' | 'in_progress' | 'resolved' | 'closed';
+  admin_comments: string | null;
+  ip_address: string | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
 export interface PaginationQuery {
   page?: number;
   limit?: number;
