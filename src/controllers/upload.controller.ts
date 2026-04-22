@@ -35,12 +35,10 @@ export async function uploadImage(req: Request, res: Response, next: NextFunctio
 
     let result: CloudinaryResult;
     if (isPDF) {
-      // PDFs use resource_type:'image' — Cloudinary serves them via the image CDN,
-      // which supports fl_attachment and delivers with correct Content-Type.
       result = await streamUpload(req.file.buffer, {
         folder,
-        resource_type: 'image',
-        public_id: safePdfPublicId(req.file.originalname),
+        resource_type: 'raw',
+        public_id: safePdfPublicId(req.file.originalname) + '.pdf',
       });
     } else {
       const b64 = req.file.buffer.toString('base64');
@@ -71,8 +69,8 @@ export async function uploadPublic(req: Request, res: Response, next: NextFuncti
     if (isPDF) {
       result = await streamUpload(req.file.buffer, {
         folder,
-        resource_type: 'image',
-        public_id: safePdfPublicId(req.file.originalname),
+        resource_type: 'raw',
+        public_id: safePdfPublicId(req.file.originalname) + '.pdf',
       });
     } else {
       const b64 = req.file.buffer.toString('base64');
