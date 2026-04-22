@@ -39,11 +39,18 @@ export async function uploadPublic(req: Request, res: Response, next: NextFuncti
     const dataUri = `data:${req.file.mimetype};base64,${b64}`;
     const isPDF   = req.file.mimetype === 'application/pdf';
 
+    // For PDFs: set public_id explicitly with .pdf extension so Cloudinary
+    // serves the correct Content-Type and browsers open it inline.
+    // use_filename doesn't work with data URIs — public_id must be explicit.
+    const pdfPublicId = isPDF
+      ? `${Date.now()}_${(req.file.originalname ?? 'documento').replace(/[^a-zA-Z0-9._-]/g, '_')}`
+      : undefined;
+
     const result = await cloudinary.uploader.upload(dataUri, {
       folder,
       resource_type: isPDF ? 'raw' : 'image',
       ...(isPDF
-        ? { use_filename: true, unique_filename: true }
+        ? { public_id: pdfPublicId }
         : { transformation: [{ quality: 'auto', fetch_format: 'auto' }] }),
     });
 
