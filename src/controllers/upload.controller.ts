@@ -1,23 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import { Readable } from 'stream';
-import https from 'https';
 import cloudinary from '../config/cloudinary';
 import { success, AppError } from '../utils/response';
 
 const CLOUDINARY_PREFIX = 'https://res.cloudinary.com/dv95y9iii/';
 
-function fetchRemoteFile(url: string): Promise<{ buffer: Buffer; contentType: string }> {
-  return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
-      const chunks: Buffer[] = [];
-      res.on('data', (chunk: Buffer) => chunks.push(chunk));
-      res.on('end', () => resolve({
-        buffer: Buffer.concat(chunks),
-        contentType: res.headers['content-type'] || 'application/octet-stream',
-      }));
-      res.on('error', reject);
-    }).on('error', reject);
-  });
+async function fetchRemoteFile(url: string): Promise<{ buffer: Buffer; contentType: string }> {
+  // Node 18+ built-in fetch follows redirects automatically.
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Cloudinary responded ${response.status}`);
+  const arrayBuffer = await response.arrayBuffer();
+  return {
+    buffer: Buffer.from(arrayBuffer),
+    contentType: response.headers.get('content-type') || 'application/octet-stream',
+  };
 }
 
 type CloudinaryResult = { secure_url: string; public_id: string };
