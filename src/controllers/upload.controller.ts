@@ -1,19 +1,29 @@
 import { Request, Response, NextFunction } from 'express';
 import { Readable } from 'stream';
+import https from 'https';
 import cloudinary from '../config/cloudinary';
 import { success, AppError } from '../utils/response';
 
 const CLOUDINARY_PREFIX = 'https://res.cloudinary.com/dv95y9iii/';
 
-async function fetchRemoteFile(url: string): Promise<{ buffer: Buffer; contentType: string }> {
-  // Node 18+ built-in fetch follows redirects automatically.
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Cloudinary responded ${response.status}`);
-  const arrayBuffer = await response.arrayBuffer();
-  return {
-    buffer: Buffer.from(arrayBuffer),
-    contentType: response.headers.get('content-type') || 'application/octet-stream',
-  };
+function fetchRemoteFile(url: string, hops = 0): Promise<{ buffer: Buffer; contentType: string }> {
+  if (hops > 5) return Promise.reject(new Error('Too many redirects'));
+  return new Promise((resolve, reject) => {
+    https.get(url, (res) => {
+      if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        res.resume(); // discard body before following redirect
+        fetchRemoteFile(res.headers.location, hops + 1).then(resolve, reject);
+        return;
+      }
+      const chunks: Buffer[] = [];
+      res.on('data', (c: Buffer) => chunks.push(c));
+      res.on('end', () => resolve({
+        buffer: Buffer.concat(chunks),
+        contentType: res.headers['content-type'] || 'application/octet-stream',
+      }));
+      res.on('error', reject);
+    }).on('error', reject);
+  });
 }
 
 type CloudinaryResult = { secure_url: string; public_id: string };
