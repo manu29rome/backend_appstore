@@ -1,7 +1,24 @@
 import { Request, Response, NextFunction } from 'express';
 import { Readable } from 'stream';
+import https from 'https';
 import cloudinary from '../config/cloudinary';
 import { success, AppError } from '../utils/response';
+
+const CLOUDINARY_PREFIX = 'https://res.cloudinary.com/dv95y9iii/';
+
+function fetchRemoteFile(url: string): Promise<{ buffer: Buffer; contentType: string }> {
+  return new Promise((resolve, reject) => {
+    https.get(url, (res) => {
+      const chunks: Buffer[] = [];
+      res.on('data', (chunk: Buffer) => chunks.push(chunk));
+      res.on('end', () => resolve({
+        buffer: Buffer.concat(chunks),
+        contentType: res.headers['content-type'] || 'application/octet-stream',
+      }));
+      res.on('error', reject);
+    }).on('error', reject);
+  });
+}
 
 type CloudinaryResult = { secure_url: string; public_id: string };
 
@@ -73,6 +90,29 @@ export async function uploadPublic(req: Request, res: Response, next: NextFuncti
     }
 
     success(res, { url: result.secure_url, public_id: result.public_id });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Proxy endpoint — fetches a Cloudinary file and serves it with correct headers.
+// No auth required (files are already public on Cloudinary), URL restricted to our cloud only.
+export async function serveFile(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const rawUrl = req.query.url as string;
+    if (!rawUrl) throw new AppError('URL requerida.', 400);
+
+    const url = decodeURIComponent(rawUrl);
+    if (!url.startsWith(CLOUDINARY_PREFIX)) throw new AppError('URL no permitida.', 403);
+
+    const { buffer, contentType } = await fetchRemoteFile(url);
+    const filename = url.split('/').pop()?.split('?')[0] ?? 'documento.pdf';
+    const isDownload = req.query.download === 'true';
+
+    res.setHeader('Content-Type', contentType.includes('pdf') ? 'application/pdf' : contentType);
+    res.setHeader('Content-Disposition', `${isDownload ? 'attachment' : 'inline'}; filename="${filename}"`);
+    res.setHeader('Cache-Control', 'private, max-age=3600');
+    res.end(buffer);
   } catch (error) {
     next(error);
   }
