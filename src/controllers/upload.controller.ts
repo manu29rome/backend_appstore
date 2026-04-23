@@ -38,6 +38,7 @@ export async function uploadImage(req: Request, res: Response, next: NextFunctio
       result = await streamUpload(req.file.buffer, {
         folder,
         resource_type: 'raw',
+        type: 'upload',
         public_id: safePdfPublicId(req.file.originalname) + '.pdf',
       });
     } else {
@@ -45,6 +46,7 @@ export async function uploadImage(req: Request, res: Response, next: NextFunctio
       result = await cloudinary.uploader.upload(`data:${req.file.mimetype};base64,${b64}`, {
         folder,
         resource_type: 'image',
+        type: 'upload',
         transformation: [{ quality: 'auto', fetch_format: 'auto' }],
       }) as CloudinaryResult;
     }
@@ -70,6 +72,7 @@ export async function uploadPublic(req: Request, res: Response, next: NextFuncti
       result = await streamUpload(req.file.buffer, {
         folder,
         resource_type: 'raw',
+        type: 'upload',
         public_id: safePdfPublicId(req.file.originalname) + '.pdf',
       });
     } else {
@@ -77,6 +80,7 @@ export async function uploadPublic(req: Request, res: Response, next: NextFuncti
       result = await cloudinary.uploader.upload(`data:${req.file.mimetype};base64,${b64}`, {
         folder,
         resource_type: 'image',
+        type: 'upload',
         transformation: [{ quality: 'auto', fetch_format: 'auto' }],
       }) as CloudinaryResult;
     }
