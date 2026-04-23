@@ -39,7 +39,6 @@ export async function uploadImage(req: Request, res: Response, next: NextFunctio
         folder,
         resource_type: 'image',
         type: 'upload',
-        access_control: [{ access_type: 'anonymous' }],
         public_id: safePdfPublicId(req.file.originalname),
       });
     } else {
@@ -74,7 +73,6 @@ export async function uploadPublic(req: Request, res: Response, next: NextFuncti
         folder,
         resource_type: 'image',
         type: 'upload',
-        access_control: [{ access_type: 'anonymous' }],
         public_id: safePdfPublicId(req.file.originalname),
       });
     } else {
