@@ -101,3 +101,18 @@ export async function deleteImage(req: Request, res: Response, next: NextFunctio
     next(error);
   }
 }
+
+// Public delete — restricted to suitextech/pqrs folder only (no auth required).
+// Used by the PQRS form when the user replaces their uploaded attachment.
+export async function deletePublic(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const public_id = req.query.public_id as string;
+    if (!public_id) throw new AppError('public_id requerido.', 400);
+    if (!public_id.startsWith('suitextech/pqrs/')) throw new AppError('Recurso no permitido.', 403);
+
+    await cloudinary.uploader.destroy(public_id, { resource_type: 'image' });
+    success(res, { deleted: true });
+  } catch (error) {
+    next(error);
+  }
+}
