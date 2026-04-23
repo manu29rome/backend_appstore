@@ -37,9 +37,9 @@ export async function uploadImage(req: Request, res: Response, next: NextFunctio
     if (isPDF) {
       result = await streamUpload(req.file.buffer, {
         folder,
-        resource_type: 'raw',
+        resource_type: 'image',
         type: 'upload',
-        public_id: safePdfPublicId(req.file.originalname) + '.pdf',
+        public_id: safePdfPublicId(req.file.originalname),
       });
     } else {
       const b64 = req.file.buffer.toString('base64');
@@ -71,9 +71,9 @@ export async function uploadPublic(req: Request, res: Response, next: NextFuncti
     if (isPDF) {
       result = await streamUpload(req.file.buffer, {
         folder,
-        resource_type: 'raw',
+        resource_type: 'image',
         type: 'upload',
-        public_id: safePdfPublicId(req.file.originalname) + '.pdf',
+        public_id: safePdfPublicId(req.file.originalname),
       });
     } else {
       const b64 = req.file.buffer.toString('base64');
